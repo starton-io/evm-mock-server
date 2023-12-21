@@ -1,0 +1,9 @@
+### Diff template
+*.patch
+*.diff
+
+### IntelliJ project files
+.idea
+*.iml
+out
+gen
