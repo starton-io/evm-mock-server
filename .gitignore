@@ -7,3 +7,12 @@
 *.iml
 out
 gen
+node_modules
+build
+npm-debug.log
+.nyc
+.env
+.DS_Store
+test/coverage/*
+**/test.js
+**/run.ts

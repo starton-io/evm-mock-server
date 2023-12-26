@@ -1,0 +1,37 @@
+{
+  "name": "evm-mock-server",
+  "version": "0.1.0",
+  "description": "Simulate an evm server to create fork, delay and other fun blockchain events. This server should help your web3 development with tools such as viem, etherjs, web3js or your own lib become more robust through the power of testing!",
+  "main": "build/index.js",
+  "scripts": {
+    "build": "rimraf ./build && tsc --build",
+    "test": "jest",
+    "dev": "nodemon"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/starton-io/evm-mock-sever.git"
+  },
+  "keywords": [
+    "web3",
+    "evm",
+    "mock",
+    "blockchain",
+    "testing"
+  ],
+  "author": "starton",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/starton-io/evm-mock-sever/issues"
+  },
+  "homepage": "https://www.starton.com",
+  "devDependencies": {
+    "@types/jest": "^29.5.11",
+    "@types/node": "^20.10.5",
+    "nodemon": "^3.0.2",
+    "rimraf": "^5.0.5",
+    "source-map-support": "^0.5.21",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
+  }
+}
