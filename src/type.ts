@@ -68,13 +68,13 @@ export interface ReceiptModel {
 }
 
 export interface BaseConfig {
-  txModel?: string;
-  rcptModel?: string;
-  logModel?: string;
-  txHash?: string;
-  TxType: ItemType;
-  RcptType: ItemType;
-  LogType: ItemType;
+  txModel?: string; // you can add model with evmCreateOrUpdateModel
+  rcptModel?: string; // you can add model with evmCreateOrUpdateModel
+  logModel?: string; // you can add model with evmCreateOrUpdateModel
+  txHash?: string; // setup your own transaction hash if you want
+  TxType: ItemType; // allow the server to add block information to transaction if needed
+  RcptType: ItemType; // allow the server to add block information to receipt if needed
+  LogType: ItemType; // allow the server to add block information to log if needed
 }
 
 export interface BlockConfig {
@@ -82,21 +82,6 @@ export interface BlockConfig {
   hash?: string;
   txLength: number; // number of transaction in the block
   txConfig: Record<number, BaseConfig>; // hash value
-}
-
-export interface BlockGeneration {
-  blockStartNumber: string;
-  blockSeriesLength: number;
-  blockStartHash?: string;
-  block?: Record<string, BlockConfig>;
-}
-
-// replace function
-// replace with number of the block and the new value
-export interface SingleBlockData {
-  block: Record<string, any>,
-  transactions: Record<string, any>,
-  receipts: Record<string, any>,
 }
 
 export interface GenerateConfig {
@@ -111,19 +96,24 @@ export interface ListBlock {
   config?: GenerateConfig;
 }
 
-/**
- * Called by the PUT method in order to create block series
- */
-export interface FakeGeneration {
-  initialSerie: BlockGeneration;
-  forkSerie?: BlockGeneration;
-
-  forkType?: ReplaceType;
-  delayIndexMs?: number;
-  increaseIndex?: number;
-  blokcIndexCfg?: GenerateConfig;
+export interface BlockGeneration {
+  blockStartNumber: string; // The block number that will be converted to bigint and hexa later
+  blockSeriesLength: number; // The number of blocks to generate
+  blockInitParentHash?: string; // Initial parent hash for your first block
+  block?: Record<string, BlockConfig>; // Specific configuration for each block, key is block number
 }
 
+/**
+ * Called by the PUT method to create block series
+ */
+export interface FakeGeneration {
+  initialSerie: BlockGeneration; // Generate a list of blocks based on configuration
+  forkSerie?: BlockGeneration; // Generate blocks that will be swapped later as the main block
+
+  forkType?: ReplaceType; // Option to determine how to base the swapped block when a fork occurs
+  delayIndexMs?: number; // When calling the next block, allow the block index to change based on time
+  increaseIndex?: number; // When calling the next block, set the next block number to be retrieved
+}
 /**
  * Data used by the server to reply to the web3 clients
  */

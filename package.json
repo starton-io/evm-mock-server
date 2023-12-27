@@ -1,7 +1,7 @@
 {
-  "name": "evm-mock-server",
+  "name": "@starton/evm-mock-server",
   "version": "0.1.0",
-  "description": "Simulate an evm server to create fork, delay and other fun blockchain events. This server should help your web3 development with tools such as viem, etherjs, web3js or your own lib become more robust through the power of testing!",
+  "description": "Simulate an EVM server to replicate forks, delays, and other impactful blockchain events. Enhance the robustness of your web3 development with tools like viem, etherjs, web3js, or your own library through the power of comprehensive testing!",
   "main": "build/index.js",
   "scripts": {
     "build": "rimraf ./build && tsc --build",

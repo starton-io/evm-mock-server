@@ -49,11 +49,35 @@ To provide maximum flexibility, we've divided our mock system into two essential
 
 Create simple blockchain scenarios that you can store in JSON format and modify independently. This allows you to generate pre-made fixtures for your tests, ensuring that you have fixed test data to validate every aspect of your application.
 
-In this part we will see how to create two very basic scenario with a block that is valid, then a scenario where the block on the first read has an invalid receipt and get replaced by one with a valid receipt
+In this part we will see how to create two very basic scenario with a block that is valid, then a scenario where the block on the first read has an invalid receipt and get replaced by one with a valid receipt. The exemples are based on this structure
+```Typescript
+interface BlockGeneration {
+  blockStartNumber: string; // The block number that will be converted to bigint and hexa later
+  blockSeriesLength: number; // The number of blocks to generate
+  blockInitParentHash?: string; // Initial parent hash for your first block
+  block?: Record<string, BlockConfig>; // Specific configuration for each block, key is block number
+}
 
-You will also have the option to create models to represent your block, transaction, receipt or log. This is useful to simulate errors that the server could send ** Add documentation for `evmCreateOrUpdateModel` in `src/generate-data.ts` **
+interface FakeGeneration {
+  initialSerie: BlockGeneration; // Generate a list of blocks based on configuration
+  forkSerie?: BlockGeneration; // Generate blocks that will be swapped later as the main block
 
- ** Add explaination about typescript struct of FakeData and FakeGeneration (generate with doc tools?) **
+  forkType?: ReplaceType; // Option to determine how to base the swapped block when a fork occurs
+  delayIndexMs?: number; // When calling the next block, allow the block index to change based on time
+  increaseIndex?: number; // When calling the next block, set the next block number to be retrieved
+}
+```
+
+You will also have the option to create models to represent your block, transaction, receipt or log. This is useful to simulate errors that the server could send. You can use those function to create a new structure for example
+```Typescript
+import rpcServer, { evmCreateOrUpdateModel, evmGetModel } from '@starton/evm-mock-server';
+const block = evmGetModel('default:block');
+console.log(block); // display the basic block structure with data inside. model based on plygon block
+const newModel = '{ "number": "0x0000" }';
+evmCreateOrUpdateModel("custom:test", newModel); // this will create a new model that you can use
+// an exemple of already existing model used can be found in the second exemple below
+```
+
 
   1. Exemple of a simple block with fixture file created
 

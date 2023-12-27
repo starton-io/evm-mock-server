@@ -71,7 +71,7 @@ export const generateFakeData = (fakeData: FakeData, dataConfig: BlockGeneration
   const blockList: Record<string, string> = {};
   let blockNumber = BigInt(dataConfig.blockStartNumber);
   let i = 0;
-  let blockParentHash = dataConfig.blockStartHash ?? '0x0000000000000000000000000000000000000000000000000000000000000000';
+  let blockParentHash = dataConfig.blockInitParentHash ?? '0x0000000000000000000000000000000000000000000000000000000000000000';
   while (i < dataConfig.blockSeriesLength) {
     const number = blockNumber.toString()
     const blockHexNumber = bigIntToHex(blockNumber);
