@@ -1,4 +1,4 @@
-import { numberToHex, randomHash, bigIntToHex } from './utils';
+import { intToHex, randomHash } from './utils';
 import { BaseConfig, BlockConfig, BlockGeneration, BlockModel, FakeData, ItemType, LogsModel, ReceiptModel, TransactionModel } from './type';
 import singleBlock from "./models/singleBlock.json";
 import singleTransaction from "./models/singleTransaction.json";
@@ -74,7 +74,7 @@ export const generateFakeData = (fakeData: FakeData, dataConfig: BlockGeneration
   let blockParentHash = dataConfig.blockInitParentHash ?? '0x0000000000000000000000000000000000000000000000000000000000000000';
   while (i < dataConfig.blockSeriesLength) {
     const number = blockNumber.toString()
-    const blockHexNumber = bigIntToHex(blockNumber);
+    const blockHexNumber = intToHex(blockNumber);
     const blockConfig: BlockConfig | undefined = dataConfig.block && dataConfig.block[number];
     const blockItem = getBlockModel(blockConfig?.blockModel);
     blockItem.number = blockHexNumber;
@@ -92,7 +92,7 @@ export const generateFakeData = (fakeData: FakeData, dataConfig: BlockGeneration
             txItem.hash = config.txHash ?? randomHash();
             txItem.blockHash = blockItem.hash;
             txItem.blockNumber = blockHexNumber;
-            txItem.transactionIndex = numberToHex(txIdx);
+            txItem.transactionIndex = intToHex(txIdx);
             const rcptItem = getReceiptModel(config.rcptModel);
             if (config.RcptType === ItemType.VALID_ITEM) {
               rcptItem.blockNumber = blockHexNumber;
@@ -120,7 +120,7 @@ export const generateFakeData = (fakeData: FakeData, dataConfig: BlockGeneration
           txItem.hash = randomHash();
           txItem.blockHash = blockItem.hash;
           txItem.blockNumber = blockHexNumber;
-          txItem.transactionIndex = numberToHex(txIdx);
+          txItem.transactionIndex = intToHex(txIdx);
           const rcptItem = getReceiptModel();
           rcptItem.blockNumber = blockHexNumber;
           rcptItem.blockHash = blockItem.hash;
@@ -183,7 +183,7 @@ export const generateFakeData = (fakeData: FakeData, dataConfig: BlockGeneration
 export const blockSeriesGenerate = (oldNumber: string, fakeData: FakeData) => {
   if (!fakeData.blockNavigation.list[fakeData.blockNavigation.index]) {
     const nextNumber = BigInt(oldNumber) + 1n;
-    const blockHexNumber = bigIntToHex(nextNumber);
+    const blockHexNumber = intToHex(nextNumber);
     const blockItem = getBlockModel();
     blockItem.number = blockHexNumber;
     blockItem.hash = randomHash();
