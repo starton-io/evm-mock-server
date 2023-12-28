@@ -164,10 +164,10 @@ export const generateFakeData = (fakeData: FakeData, dataConfig: BlockGeneration
       });
 
     }
-    fakeData.block[blockItem.hash] = blockItem;
+    fakeData.blocks[blockItem.hash] = blockItem;
     blockParentHash = blockItem.hash;
     if (isPrimary) { // the primary range should have the most blocks and be the one listed
-      fakeData.listBlock.list.push(blockHexNumber);// allow the server to increment the search by number
+      fakeData.blockNavigation.list.push(blockHexNumber);// allow the server to increment the search by number
       fakeData.blockByNumber[blockHexNumber] = blockItem.hash; // used to target the correct "branch" of blocks
     }
     blockNumber = blockNumber + 1n;
@@ -181,7 +181,7 @@ export const generateFakeData = (fakeData: FakeData, dataConfig: BlockGeneration
  * TODO: refactor with generateFakeData after we find options we could use
  */
 export const blockSeriesGenerate = (oldNumber: string, fakeData: FakeData) => {
-  if (!fakeData.listBlock.list[fakeData.listBlock.index]) {
+  if (!fakeData.blockNavigation.list[fakeData.blockNavigation.index]) {
     const nextNumber = BigInt(oldNumber) + 1n;
     const blockHexNumber = bigIntToHex(nextNumber);
     const blockItem = getBlockModel();
@@ -212,7 +212,7 @@ export const blockSeriesGenerate = (oldNumber: string, fakeData: FakeData) => {
       fakeData.receipts[transaction.hash] = receipt;
       return transaction;
     });
-    fakeData.block[blockItem.hash] = blockItem;
-    fakeData.listBlock.list.push(blockHexNumber);
+    fakeData.blocks[blockItem.hash] = blockItem;
+    fakeData.blockNavigation.list.push(blockHexNumber);
   }
 }

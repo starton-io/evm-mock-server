@@ -164,13 +164,13 @@ The heart of this part is the function `getResponse` found in `server-response.t
 This part rely on a few variables present in the fakeData interface.
 ```Typescript
 interface FakeData {
-  block: Record<string, any>,// Contains information about blocks <blockHash, blockData>
+  blocks: Record<string, any>,// Contains information about blocks <blockHash, blockData>
   transactions: Record<string, any>; // Stores details of transactions <txHash, txkData>
   receipts: Record<string, any>; // Holds receipt data <txHash, rcptData>
   blockByNumber: Record<string, string>; // Maps block numbers to their corresponding hashes
   replaceBlock?: Record<string, string>; // Used for simulating forks by replacing block hashes
   replaceType?: ReplaceType; // Indicates the type of replacement (e.g., after first read, after some time)
-  listBlock: ListBlock; // Stores an array of block numbers and their index for simulating block creation
+  blockNavigation: BlockNavigation; // Stores an array of block numbers and their index for simulating block retrieval
 }
 ```
 For the server part those are important to keep in mind

@@ -17,11 +17,11 @@ const evmMockSetData = (url: string, data: FakeData) => {
  */
 function extractBody(rawData: string): FakeData | PromiseLike<FakeData> {
   const fakeData: FakeData = {
-    block: {},
+    blocks: {},
     transactions: {},
     receipts: {},
     blockByNumber: {},
-    listBlock: {
+    blockNavigation: {
       index: 0,
       list: [],
       idxType: IncreaseType.NONE,
@@ -35,11 +35,11 @@ function extractBody(rawData: string): FakeData | PromiseLike<FakeData> {
     fakeData.replaceType = generation.forkType ?? ReplaceType.AFTER_FIRST_READ;
   }
   if (generation.increaseIndex) {
-    fakeData.listBlock.idxType = IncreaseType.SERIAL;
+    fakeData.blockNavigation.idxType = IncreaseType.SERIAL;
   }
   if (generation.delayIndexMs) {
-    fakeData.listBlock.idxType = IncreaseType.TIME_BASED;
-    fakeData.listBlock.config = {
+    fakeData.blockNavigation.idxType = IncreaseType.TIME_BASED;
+    fakeData.blockNavigation.config = {
       ms: generation.delayIndexMs,
     }
   }
@@ -76,7 +76,7 @@ const evmMockServer = async (serverPort: number = 55001) => {
   });
   
   server.listen(serverPort, async () => {
-    console.log(`listening on port ${serverPort}`)
+    console.log(`evmMockServer listening on port ${serverPort}`)
   });
   
   process.on('SIGTERM', () => {

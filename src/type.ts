@@ -89,7 +89,7 @@ export interface GenerateConfig {
   generateIndex?: () => {};
 }
 
-export interface ListBlock {
+export interface BlockNavigation {
   index: number;
   list: Array<string>;
   idxType: IncreaseType;
@@ -118,11 +118,11 @@ export interface FakeGeneration {
  * Data used by the server to reply to the web3 clients
  */
 export interface FakeData {
-  block: Record<string, any>,// Contains information about blocks <blockHash, blockData>
+  blocks: Record<string, any>,// Contains information about blocks <blockHash, blockData>
   transactions: Record<string, any>; // Stores details of transactions <txHash, txkData>
   receipts: Record<string, any>; // Holds receipt data <txHash, rcptData>
   blockByNumber: Record<string, string>; // Maps block numbers to their corresponding hashes
   replaceBlock?: Record<string, string>; // Used for simulating forks by replacing block hashes
   replaceType?: ReplaceType; // Indicates the type of replacement (e.g., after first read, after some time)
-  listBlock: ListBlock; // Stores an array of block numbers and their index for simulating block creation
+  blockNavigation: BlockNavigation; // Stores an array of block numbers and their index for simulating block retrieval
 }
