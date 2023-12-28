@@ -18,7 +18,7 @@ const changeIndex = (fakeData: FakeData, url: string) => {
     blockSeriesGenerate(blockNumber, fakeData);
   } else if (fakeData.blockNavigation.idxType === IncreaseType.TIME_BASED) {
     if (!timerList[url]) {
-      const time = fakeData.blockNavigation.config?.ms ?? 1000;
+      const time = fakeData.blockNavigation?.indexDelay ?? 1000;
       timerList[url] = timer(time, fakeData, url, 1);
     }
   }

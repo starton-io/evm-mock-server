@@ -1,6 +1,6 @@
 import { createServer, IncomingMessage, ServerResponse } from 'node:http';
 import { basicBody } from './parse-body';
-import { FakeData, FakeGeneration, IncreaseType, ItemType, ReplaceType, JSONRPC } from './type';
+import { FakeData, FakeGeneration, IncreaseType, ItemType, ReplaceType, JSONRPC, ServerHook } from './type';
 import * as evmMockUtils from './utils';
 import { getResponse } from './server-response';
 import { generateFakeData, evmCreateOrUpdateModel, evmGetModel } from './generate-data';
@@ -39,14 +39,12 @@ function extractBody(rawData: string): FakeData | PromiseLike<FakeData> {
   }
   if (generation.delayIndexMs) {
     fakeData.blockNavigation.idxType = IncreaseType.TIME_BASED;
-    fakeData.blockNavigation.config = {
-      ms: generation.delayIndexMs,
-    }
+    fakeData.blockNavigation.indexDelay = generation.delayIndexMs;
   }
   return fakeData;
 }
 
-const evmMockServer = async (serverPort: number = 55001) => {
+const evmMockServer = async (serverPort: number = 55001, serverHook?: ServerHook) => {
   const server = createServer(async (request: IncomingMessage, response: ServerResponse) => {
     if (!request.url) {
       request.url = '/';
@@ -59,6 +57,11 @@ const evmMockServer = async (serverPort: number = 55001) => {
       const rawData: string = await basicBody(request);
       //console.log(`body received: ${rawData}`);
       const body: JSONRPC | Array<JSONRPC> = JSON.parse(rawData);
+      // Add delay here for the server if set
+      const data = fakeData[request.url];
+      if (serverHook && serverHook.PreResponse) {
+        await serverHook.PreResponse(request, body, data);
+      }
       response.setHeader('Content-Type', 'application/json');
       if (Array.isArray(body)) {
         const answers: Array<Object> = [];
@@ -102,4 +105,4 @@ export {
   IncreaseType,
   ReplaceType,
 }
-export type { FakeData, FakeGeneration };
+export type { FakeData, FakeGeneration, JSONRPC };

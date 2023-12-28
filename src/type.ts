@@ -1,3 +1,5 @@
+import { IncomingMessage } from "node:http";
+
 export interface JSONRPC {
   jsonrpc: string,
   id: number,
@@ -93,7 +95,7 @@ export interface BlockNavigation {
   index: number;
   list: Array<string>;
   idxType: IncreaseType;
-  config?: GenerateConfig;
+  indexDelay?: number;
 }
 
 export interface BlockGeneration {
@@ -101,6 +103,10 @@ export interface BlockGeneration {
   blockSeriesLength: number; // The number of blocks to generate
   blockInitParentHash?: string; // Initial parent hash for your first block
   block?: Record<string, BlockConfig>; // Specific configuration for each block, key is block number
+}
+
+export interface ServerHook {
+  PreResponse?: (request: IncomingMessage, body: JSONRPC | Array<JSONRPC>, data?: FakeData) => Promise<void>;
 }
 
 /**

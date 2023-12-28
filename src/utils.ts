@@ -25,4 +25,4 @@ export const intToHex = (number: bigint | number) => `0x${number.toString(16)}`;
  * @param delayMs time to wait in ms
  * @returns 
  */
-export const waitFor = (delayMs: number) => new Promise((resolve) => setTimeout(resolve, delayMs))
+export const waitFor = (delayMs: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, delayMs))
