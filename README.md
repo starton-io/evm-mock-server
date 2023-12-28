@@ -158,6 +158,24 @@ await fetch(rpcUrl, {
 
 The core of the service, the HTTP server reads the data previously generated and sends it back according to basic configurations you provide during creation. We've kept the structure as simple as possible, opting to split the fake data you create by URL. This approach enables multiple scenarios based on the URL you call, facilitating concurrent testing.
 
+In order to start your server you will need to call the default exported function as shown in the exemple below, we also added a hook exemple if you want to create delays or other things, but it is not mandatory!
+```Typescript
+import rpcServer, { evmMockUtils } from '@starton/evm-mock-server';
+// start a simple server
+serverRpc = await rpcServer(55001);
+
+// start a server and whenever a client call the endpoint /unique, delay the answer for 1000ms
+// It might help you debug the data you send to the server as well
+serverRpc = await rpcServer(55001, {
+  PreResponse: async (request: IncomingMessage, body: JSONRPC | JSONRPC[], data?: FakeData) => {
+    if (request.url === '/unique') {
+      console.log('in unique call ', body)
+      await evmMockUtils.waitFor(1000);
+    }
+  }
+})
+```
+
 The http server simulate RPC method with the POST method, once a method is called on a url. It also handle multicall if you pass all your calls as array
 The heart of this part is the function `getResponse` found in `server-response.ts`
 
