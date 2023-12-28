@@ -158,7 +158,8 @@ await fetch(rpcUrl, {
 
 The core of the service, the HTTP server reads the data previously generated and sends it back according to basic configurations you provide during creation. We've kept the structure as simple as possible, opting to split the fake data you create by URL. This approach enables multiple scenarios based on the URL you call, facilitating concurrent testing.
 
-In order to start your server you will need to call the default exported function as shown in the exemple below, we also added a hook exemple if you want to create delays or other things, but it is not mandatory!
+To initiate the server, you should invoke the default exported function, as demonstrated in the example below. We've also included a hook example that allows you to introduce delays or perform other actions, although it is not mandatory.
+
 ```Typescript
 import rpcServer, { evmMockUtils } from '@starton/evm-mock-server';
 // start a simple server
