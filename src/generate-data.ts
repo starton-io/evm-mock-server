@@ -72,6 +72,14 @@ export const generateFakeData = (fakeData: FakeData, dataConfig: BlockGeneration
   let blockNumber = BigInt(dataConfig.blockStartNumber);
   let i = 0;
   let blockParentHash = dataConfig.blockInitParentHash ?? '0x0000000000000000000000000000000000000000000000000000000000000000';
+  if (isPrimary === false && blockParentHash === '0x0000000000000000000000000000000000000000000000000000000000000000') {
+    // should get the parentHash of the valid block?
+    const previousBlockNumber = blockNumber - 1n;
+    const lastBlockHash = fakeData.blockByNumber[previousBlockNumber.toString()]
+    if (lastBlockHash) {
+      blockParentHash = fakeData.blocks[lastBlockHash].parentHash;
+    }
+  }
   while (i < dataConfig.blockSeriesLength) {
     const number = blockNumber.toString()
     const blockHexNumber = intToHex(blockNumber);

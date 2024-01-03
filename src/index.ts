@@ -1,6 +1,6 @@
 import { createServer, IncomingMessage, ServerResponse } from 'node:http';
 import { basicBody } from './parse-body';
-import { FakeData, FakeGeneration, IncreaseType, ItemType, ReplaceType, JSONRPC, ServerHook } from './type';
+import { FakeData, FakeGeneration, IncreaseType, ItemType, ReplaceType, JSONRPC, ServerHook, BlockConfig } from './type';
 import * as evmMockUtils from './utils';
 import { getResponse } from './server-response';
 import { generateFakeData, evmCreateOrUpdateModel, evmGetModel } from './generate-data';
@@ -105,4 +105,4 @@ export {
   IncreaseType,
   ReplaceType,
 }
-export type { FakeData, FakeGeneration, JSONRPC };
+export type { FakeData, FakeGeneration, JSONRPC, BlockConfig };
