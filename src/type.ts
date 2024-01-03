@@ -8,7 +8,7 @@ export interface JSONRPC {
 }
 
 export interface ErrorExample {
-  code: string;
+  code: number;
   message: string;
 }
 

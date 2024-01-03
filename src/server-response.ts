@@ -24,7 +24,7 @@ const changeIndex = (fakeData: FakeData, url: string) => {
   }
 }
 
-export const getResponse = async (body: JSONRPC | undefined, data: Record<string, FakeData> | undefined, url: string): Promise<Object> => {
+export const getResponse = async (body: JSONRPC | undefined, data: Record<string, FakeData> | undefined, url: string): Promise<RPCResponse> => {
   if (body === undefined || data === undefined) {
     // fake data is initialised at the root of the server so it cant be unitialised
     throw new Error('Body request is not valid, received undefined');
@@ -57,7 +57,7 @@ export const getResponse = async (body: JSONRPC | undefined, data: Record<string
         }
         changeIndex(fakeData, url);
       } else {
-        rpcData.error = { code: '0', message: 'Number not correctly set' }
+        rpcData.error = { code: -32000, message: `Could not find block ${number}` }
       }
       return rpcData;
     case 'eth_blockNumber':
@@ -74,5 +74,9 @@ export const getResponse = async (body: JSONRPC | undefined, data: Record<string
       }
       return rpcData;
   }
-  return '';
+  rpcData.error = {
+    code: -32601,
+    message: 'method not found',
+  }
+  return rpcData;
 }
