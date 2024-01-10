@@ -6,6 +6,7 @@
   "homepage": "https://www.starton.com",
   "main": "build/index.js",
   "types": "build/index.d.ts",
+  "private": false,
   "author": {
     "name": "Starton",
     "email": "hello@starton.com",
