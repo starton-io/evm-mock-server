@@ -2,11 +2,9 @@
 module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'node',
-  preset: 'ts-jest/presets/default-esm', // or other ESM presets
   moduleNameMapper: {
     '^(\\.{1,2}/.*)\\.js$': '$1',
   },
-  setupFiles: ['./setEnvVars.ts'],
   clearMocks: true,
   collectCoverage: true,
   coverageDirectory: 'coverage',
