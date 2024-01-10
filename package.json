@@ -1,5 +1,5 @@
 {
-  "version": "0.1.2",
+  "version": "0.1.3",
   "name": "@starton/evm-mock-server",
   "description": "Simulate an EVM server to replicate forks, delays, and other impactful blockchain events. Enhance the robustness of your web3 development with tools like viem, etherjs, web3js, or your own library through the power of comprehensive testing!",
   "license": "Apache-2.0",
@@ -32,6 +32,10 @@
   "files": [
     "build"
   ],
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "scripts": {
     "build": "rimraf ./build && tsc --build",
     "test": "jest",
