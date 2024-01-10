@@ -1,5 +1,5 @@
 {
-  "version": "0.1.0",
+  "version": "0.1.1",
   "name": "@starton/evm-mock-server",
   "description": "Simulate an EVM server to replicate forks, delays, and other impactful blockchain events. Enhance the robustness of your web3 development with tools like viem, etherjs, web3js, or your own library through the power of comprehensive testing!",
   "license": "Apache-2.0",
