@@ -17,16 +17,7 @@ To install the project, first clone the repository and go inside project directo
 
 - With [NPM](https://www.npmjs.com/) :
     ```bash
-    $ npm install
-    ```
-
-## Run Locally
-
-Your project is now ready to be modified by you, for that you just have to launch the server via the command below:
-
-- With [NPM](https://www.npmjs.com/) :
-    ```bash
-    $ npm run dev
+    $ npm install @starton/evm-mock-server
     ```
 
 ## Usage
@@ -60,7 +51,7 @@ interface FakeGeneration {
 
 You will also have the option to create models to represent your block, transaction, receipt or log. This is useful to simulate errors that the server could send. You can use those function to create a new structure for example
 ```Typescript
-import rpcServer, { evmCreateOrUpdateModel, evmGetModel } from '@starton/evm-mock-server';
+import { evmMockServer, evmCreateOrUpdateModel, evmGetModel } from '@starton/evm-mock-server';
 const block = evmGetModel('default:block');
 console.log(block); // display the basic block structure with data inside. model based on plygon block
 const newModel = '{ "number": "0x0000" }';
@@ -72,7 +63,7 @@ evmCreateOrUpdateModel("custom:test", newModel); // this will create a new model
   1. Exemple of a simple block with fixture file created
 
 ```Typescript
-import rpcServer from '@starton/evm-mock-server';
+import { evmMockServer } from '@starton/evm-mock-server';
 import { writeFile } from 'node:fs';
 const rpcUrl = 'http://localhost:55001/unique';
 const blockNumber = '43439028';
@@ -98,7 +89,7 @@ writeFile('./fixture-simple.json', JSON.stringify((await response.json()), null,
   2. Example with a fork occuring after the first block is called and read
 
 ```Typescript
-import rpcServer, { evmMockUtils } from '@starton/evm-mock-server';
+import { evmMockServer, evmMockUtils } from '@starton/evm-mock-server';
 const rpcUrl = 'http://localhost:55001/unique';
 const blockNumber = '43439028';
 // this generate hash with default length found in blocks and transactions
@@ -151,13 +142,13 @@ The core of the service, the HTTP server reads the data previously generated and
 To initiate the server, you should invoke the default exported function, as demonstrated in the example below. We've also included a hook example that allows you to introduce delays or perform other actions, although it is not mandatory.
 
 ```Typescript
-import rpcServer, { evmMockUtils } from '@starton/evm-mock-server';
+import { evmMockServer, evmMockUtils } from '@starton/evm-mock-server';
 // start a simple server
-serverRpc = await rpcServer(55001);
+serverRpc = await evmMockServer(55001);
 
 // start a server and whenever a client call the endpoint /unique, delay the answer for 1000ms
 // It might help you debug the data you send to the server as well
-serverRpc = await rpcServer(55001, {
+serverRpc = await evmMockServer(55001, {
   PreResponse: async (request: IncomingMessage, body: JSONRPC | JSONRPC[], data?: FakeData) => {
     if (request.url === '/unique') {
       console.log('in unique call ', body)
