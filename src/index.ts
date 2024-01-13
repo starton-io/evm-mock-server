@@ -95,8 +95,8 @@ const evmMockServer = async (serverPort: number = 55001, serverHook?: ServerHook
   return server;
 }
 
-export default evmMockServer;
 export {
+  evmMockServer,
   evmMockUtils,
   evmMockSetData,
   evmCreateOrUpdateModel,
