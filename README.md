@@ -193,6 +193,8 @@ Please adhere to Starton's [Code of Conduct](./CODE_OF_CONDUCT.md).
 
 ### Todo: Viem, etherjs...
 
+Please use the develop branch in order to contribute with PR
+
 - [ ] Add a test with viem
 - [ ] Add a test with etherjs
 - [ ] Create scenarios with list of block and a fork
