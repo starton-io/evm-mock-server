@@ -15,11 +15,6 @@ You will need :
 
 To install the project, first clone the repository and go inside project directory, then :
 
-- With [yarn](https://yarnpkg.com/) :
-    ```bash
-    $ yarn install
-    ```
-
 - With [NPM](https://www.npmjs.com/) :
     ```bash
     $ npm install
@@ -28,11 +23,6 @@ To install the project, first clone the repository and go inside project directo
 ## Run Locally
 
 Your project is now ready to be modified by you, for that you just have to launch the server via the command below:
-
-- With [yarn](https://yarnpkg.com/) :
-    ```bash
-    $ yarn dev
-    ```
 
 - With [NPM](https://www.npmjs.com/) :
     ```bash

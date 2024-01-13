@@ -13,6 +13,7 @@ npm-debug.log
 .nyc
 .env
 .DS_Store
+.tsbuildinfo
 test/coverage/*
 **/test.js
 **/run.ts
