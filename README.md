@@ -144,11 +144,11 @@ To initiate the server, you should invoke the default exported function, as demo
 ```Typescript
 import { evmMockServer, evmMockUtils } from '@starton/evm-mock-server';
 // start a simple server
-serverRpc = await evmMockServer(55001);
+const serverRpc = await evmMockServer(55001);
 
 // start a server and whenever a client call the endpoint /unique, delay the answer for 1000ms
 // It might help you debug the data you send to the server as well
-serverRpc = await evmMockServer(55001, {
+const serverRpc = await evmMockServer(55001, {
   PreResponse: async (request: IncomingMessage, body: JSONRPC | JSONRPC[], data?: FakeData) => {
     if (request.url === '/unique') {
       console.log('in unique call ', body)
@@ -190,6 +190,16 @@ Feel free to explore, contribute, and shape the future of EvmMockServer with us!
 To get started, see [CONTRIBUTING.md](./CONTRIBUTING.md).
 
 Please adhere to Starton's [Code of Conduct](./CODE_OF_CONDUCT.md).
+
+### Todo: Viem, etherjs...
+
+Please use the develop branch in order to contribute with PR
+
+- [ ] Add a test with viem
+- [ ] Add a test with etherjs
+- [ ] Create scenarios with list of block and a fork
+- [ ] Find edge cases for test
+- [ ] Test server with different latency values
 
 ## License
 
