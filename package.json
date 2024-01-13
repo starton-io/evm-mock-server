@@ -38,8 +38,7 @@
   },
   "scripts": {
     "build": "rimraf ./build && tsc --build",
-    "test": "jest",
-    "dev": "nodemon"
+    "test": "jest"
   },
   "devDependencies": {
     "@types/jest": "^29.5.11",
