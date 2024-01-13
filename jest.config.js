@@ -8,9 +8,8 @@ module.exports = {
   clearMocks: true,
   collectCoverage: true,
   coverageDirectory: 'coverage',
-  coveragePathIgnorePatterns: ['/node_modules/', '/lib/', '/database/', '/ops/', '/docker-build/', '/fix/'],
+  coveragePathIgnorePatterns: ['/node_modules/', '/build/', '/.github/'],
   coverageProvider: 'babel',
-  rootDir: './test',
   testMatch: ["**/?(*.)+(spec|test).ts"],
   transform: {
     // '^.+\\.[tj]sx?$' to process js/ts with `ts-jest`

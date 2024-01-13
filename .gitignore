@@ -16,3 +16,4 @@ npm-debug.log
 .tsbuildinfo
 test/coverage/*
 **/test.js
+coverage/*
