@@ -73,6 +73,9 @@ export const getResponse = async (body: JSONRPC | undefined, data: Record<string
         rpcData.result = data;
       }
       return rpcData;
+    case 'eth_chainId':
+      rpcData.result = fakeData.chainId;
+      return rpcData;
   }
   rpcData.error = {
     code: -32601,

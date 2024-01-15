@@ -25,7 +25,8 @@ function extractBody(rawData: string): FakeData | PromiseLike<FakeData> {
       index: 0,
       list: [],
       idxType: IncreaseType.NONE,
-    }
+    },
+    chainId: '0x1',
   }
   const generation: FakeGeneration = JSON.parse(rawData);
   generateFakeData(fakeData, generation.initialSerie, true);
@@ -40,6 +41,9 @@ function extractBody(rawData: string): FakeData | PromiseLike<FakeData> {
   if (generation.delayIndexMs) {
     fakeData.blockNavigation.idxType = IncreaseType.TIME_BASED;
     fakeData.blockNavigation.indexDelay = generation.delayIndexMs;
+  }
+  if (generation.chainId) {
+    fakeData.chainId = evmMockUtils.intToHex(generation.chainId);
   }
   return fakeData;
 }
