@@ -37,4 +37,33 @@ describe('Testing call with ethers', () => {
     const lastBock = await viem.getBlockNumber();
     assert(BigInt(blockNumber) === lastBock, `Block number is incorrect, should be ${blockNumber} but is ${lastBock.toString()}`);
   });
+
+  test('Basic multicall', async () => {
+    const rpcUrl = `http://localhost:${port}/unique`;
+    const blockNumber = '43439020';
+    // Create one block in the mock server
+    const response = await fetch(rpcUrl, {
+      method: "PUT",
+      body: JSON.stringify({
+        initialSerie: {
+            blockStartNumber: blockNumber,
+            blockSeriesLength: 1
+        }
+      })
+    });
+    const blockGenerated = await response.json();
+    const viem = createPublicClient({
+      chain: mainnet,
+      transport: http(rpcUrl),
+      batch: {
+        multicall: true
+      },
+    });
+    const transactions = Object.keys(blockGenerated.transactions);
+    const getReceipt = transactions.map((hash) => viem.getTransactionReceipt({
+      hash: hash as `0x${string}`
+    }))
+    const rcpt = await Promise.all(getReceipt);
+    assert(rcpt.length === transactions.length, `Receipt and transaction number do not match`);
+  });
 });
