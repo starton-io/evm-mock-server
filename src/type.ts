@@ -119,6 +119,7 @@ export interface FakeGeneration {
   forkType?: ReplaceType; // Option to determine how to base the swapped block when a fork occurs
   delayIndexMs?: number; // When calling the next block, allow the block index to change based on time
   increaseIndex?: number; // When calling the next block, set the next block number to be retrieved
+  chainId?: number; // Specify a chainID otherwise will be 1
 }
 /**
  * Data used by the server to reply to the web3 clients
@@ -131,4 +132,5 @@ export interface FakeData {
   replaceBlock?: Record<string, string>; // Used for simulating forks by replacing block hashes
   replaceType?: ReplaceType; // Indicates the type of replacement (e.g., after first read, after some time)
   blockNavigation: BlockNavigation; // Stores an array of block numbers and their index for simulating block retrieval
+  chainId: string; // hexa value of the chainID
 }

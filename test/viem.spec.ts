@@ -1,10 +1,12 @@
 import { IncomingMessage, Server, ServerResponse } from 'node:http';
-import { evmMockServer } from '../src/index'
+import { createPublicClient, http } from 'viem';
+import { mainnet } from 'viem/chains';
 import assert from 'node:assert';
+import { evmMockServer } from '../src/index';
 
-const port = 55003
+const port = 55002;
 let serverRpc: Server<typeof IncomingMessage, typeof ServerResponse> | null;
-describe('Testing the test server', () => {
+describe('Testing call with ethers', () => {
   beforeAll(async () => {
     serverRpc = await evmMockServer(port);
   });
@@ -13,13 +15,9 @@ describe('Testing the test server', () => {
     serverRpc?.close();
   });
 
-  test('Server properly started', async () => {
-    assert(serverRpc?.listening, 'server is listening');
-  });
-
-  test('Create a block on /unique and verify it', async () => {
+  test('Basic get last block', async () => {
     const rpcUrl = `http://localhost:${port}/unique`;
-    const blockNumber = '43439028';
+    const blockNumber = '43439020';
     // Create one block in the mock server
     const response = await fetch(rpcUrl, {
       method: "PUT",
@@ -31,6 +29,12 @@ describe('Testing the test server', () => {
       })
     });
     await response.json();
-    // end zith no errors
+    const viem = createPublicClient({
+      chain: mainnet,
+      transport: http(rpcUrl),
+    });
+
+    const lastBock = await viem.getBlockNumber();
+    assert(BigInt(blockNumber) === lastBock, `Block number is incorrect, should be ${blockNumber} but is ${lastBock.toString()}`);
   });
 });

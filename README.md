@@ -46,6 +46,7 @@ interface FakeGeneration {
   forkType?: ReplaceType; // Option to determine how to base the swapped block when a fork occurs
   delayIndexMs?: number; // When calling the next block, allow the block index to change based on time
   increaseIndex?: number; // When calling the next block, set the next block number to be retrieved
+  chainId?: number; // Specify a chainID otherwise will be 1
 }
 ```
 
@@ -191,12 +192,12 @@ To get started, see [CONTRIBUTING.md](./CONTRIBUTING.md).
 
 Please adhere to Starton's [Code of Conduct](./CODE_OF_CONDUCT.md).
 
-### Todo: Viem, etherjs...
+#### Future plan
 
 Please use the develop branch in order to contribute with PR
 
-- [ ] Add a test with viem
-- [ ] Add a test with etherjs
+- [x] Add a test with viem
+- [x] Add a test with etherjs
 - [ ] Create scenarios with list of block and a fork
 - [ ] Find edge cases for test
 - [ ] Test server with different latency values
