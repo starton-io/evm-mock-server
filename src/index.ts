@@ -79,7 +79,7 @@ const evmMockServer = async (serverPort: number = 55001, serverHook?: ServerHook
   });
   
   server.listen(serverPort, async () => {
-    console.log(`evmMockServer listening on port ${serverPort}`)
+    // console.log(`evmMockServer listening on port ${serverPort}`)
   });
   
   process.on('SIGTERM', () => {
