@@ -31,6 +31,6 @@ describe('Testing the test server', () => {
       })
     });
     await response.json();
-    // end zith no errors
+    // end with no errors
   });
 });

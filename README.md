@@ -201,6 +201,7 @@ Please use the develop branch in order to contribute with PR
 - [ ] Create scenarios with list of block and a fork
 - [ ] Find edge cases for test
 - [ ] Test server with different latency values
+- [ ] Error when we have more than 1000 object from json length
 
 ## License
 
