@@ -1,5 +1,5 @@
 {
-  "version": "0.3.1",
+  "version": "0.3.2",
   "name": "@starton/evm-mock-server",
   "description": "Simulate an EVM server to replicate forks, delays, and other impactful blockchain events. Enhance the robustness of your web3 development with tools like viem, etherjs, web3js, or your own library through the power of comprehensive testing!",
   "license": "Apache-2.0",
@@ -20,10 +20,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/starton-io/evm-mock-sever.git"
+    "url": "git+https://github.com/starton-io/evm-mock-server.git"
   },
   "bugs": {
-    "url": "https://github.com/starton-io/evm-mock-sever/issues"
+    "url": "https://github.com/starton-io/evm-mock-server/issues"
   },
   "keywords": [
     "web3",
