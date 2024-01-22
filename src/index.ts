@@ -1,10 +1,10 @@
 import { createServer, IncomingMessage, ServerResponse } from 'node:http';
 import { basicBody } from './parse-body';
-import { FakeData, FakeGeneration, IncreaseType, ItemType, ReplaceType, JSONRPC, ServerHook, BlockConfig } from './type';
+import { FakeData, FakeGeneration, IncreaseType, ItemType, ReplaceType, JSONRPC, ServerHook, BlockConfig, RPCResponse } from './type';
 import * as evmMockUtils from './utils';
 import { getResponse } from './server-response';
 import { generateFakeData, evmCreateOrUpdateModel, evmGetModel } from './generate-data';
-
+//import { writeFile } from 'node:fs';
 const fakeData: Record<string, FakeData> = {}
 const evmMockSetData = (url: string, data: FakeData) => {
   fakeData[url] = data;
@@ -15,7 +15,7 @@ const evmMockSetData = (url: string, data: FakeData) => {
  * @param rawData body that should parse to FakeGeneration
  * @returns 
  */
-function extractBody(rawData: string): FakeData | PromiseLike<FakeData> {
+async function extractBody(rawData: string): Promise<FakeData> {
   const fakeData: FakeData = {
     blocks: {},
     transactions: {},
@@ -29,9 +29,12 @@ function extractBody(rawData: string): FakeData | PromiseLike<FakeData> {
     chainId: '0x1',
   }
   const generation: FakeGeneration = JSON.parse(rawData);
-  generateFakeData(fakeData, generation.initialSerie, true);
+  if (generation.chainId) {
+    fakeData.chainId = evmMockUtils.intToHex(generation.chainId);
+  }
+  await generateFakeData(fakeData, generation.initialSerie, true);
   if (generation.forkSerie) {
-    const forkList = generateFakeData(fakeData, generation.forkSerie, false);
+    const forkList = await generateFakeData(fakeData, generation.forkSerie, false);
     fakeData.replaceBlock = forkList;
     fakeData.replaceType = generation.forkType ?? ReplaceType.AFTER_FIRST_READ;
   }
@@ -42,11 +45,41 @@ function extractBody(rawData: string): FakeData | PromiseLike<FakeData> {
     fakeData.blockNavigation.idxType = IncreaseType.TIME_BASED;
     fakeData.blockNavigation.indexDelay = generation.delayIndexMs;
   }
-  if (generation.chainId) {
-    fakeData.chainId = evmMockUtils.intToHex(generation.chainId);
-  }
+  /*if (generation.chainId === 80001) {
+    writeFile('./fixture-simple.json', JSON.stringify((fakeData), null, 2), (error) => {
+      if (error) {
+        console.log('An error has occurred ', error);
+        return;
+      }
+      console.log('Data written successfully to disk');
+    });
+  }*/
+  
   return fakeData;
 }
+
+/*const chunkSize = 16 * 1024;
+const sendChunkedResponse = (response: ServerResponse, rawData: FakeData) => {
+  // Set appropriate headers
+  response.setHeader('Content-Type', 'application/json');
+  let data = JSON.stringify(rawData);
+  // Function to send chunks
+  const sendChunk = () => {
+    const chunk = data.substring(0, chunkSize);
+    data = data.substring(chunkSize);
+
+    if (chunk.length > 0) {
+      response.write(chunk);
+      // Uncomment the line below if you want to simulate delays between chunks
+      setImmediate(sendChunk); // Adjust delay as needed
+    } else {
+      response.end();
+    }
+  };
+
+  // Start sending chunks
+  sendChunk();
+};*/
 
 const evmMockServer = async (serverPort: number = 55001, serverHook?: ServerHook) => {
   const server = createServer(async (request: IncomingMessage, response: ServerResponse) => {
@@ -56,6 +89,7 @@ const evmMockServer = async (serverPort: number = 55001, serverHook?: ServerHook
     if (request.method === 'PUT') {
       const rawData: string = await basicBody(request);
       fakeData[request.url] = await extractBody(rawData);
+      //return sendChunkedResponse(response, fakeData[request.url]);
       return response.end(JSON.stringify(fakeData[request.url]));
     } else if (request.method === 'POST') {
       const rawData: string = await basicBody(request);
@@ -73,9 +107,12 @@ const evmMockServer = async (serverPort: number = 55001, serverHook?: ServerHook
           const ret = await getResponse(body[i], fakeData, request.url);
           answers.push(ret);
         }
+        //console.log(answers)
         return response.end(JSON.stringify(answers));
       } else {
-        return response.end(JSON.stringify(await getResponse(body, fakeData, request.url)));
+        const answer = await getResponse(body, fakeData, request.url);
+        //console.log(answer)
+        return response.end(JSON.stringify(answer));
       }
     }
     response.statusCode = 404;

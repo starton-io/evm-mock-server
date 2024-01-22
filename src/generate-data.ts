@@ -1,8 +1,14 @@
+import { Block } from '@ethereumjs/block';
+import { TransactionFactory } from '@ethereumjs/tx';
+import { Common } from '@ethereumjs/common';
+import { privateToPublic, publicToAddress, Address, Account, bytesToHex } from '@ethereumjs/util';
 import { intToHex, randomHash } from './utils';
 import { BaseConfig, BlockConfig, BlockGeneration, BlockModel, FakeData, ItemType, LogsModel, ReceiptModel, TransactionModel } from './type';
 import singleBlock from "./models/singleBlock.json";
 import singleTransaction from "./models/singleTransaction.json";
 import singleReceipt from "./models/singleReceipt.json";
+import { randomBytes } from 'crypto';
+import { Trie } from '@ethereumjs/trie';
 //import singleLog from "./models/singleLog.json";
 
 const ItemModels: Record<string, any> = {
@@ -58,6 +64,58 @@ export const evmGetModel = (key: string) => {
   return ItemModels[key];
 }
 
+interface TestAccount {
+  privateKey: Buffer;
+  publicKey: Uint8Array;
+  address: Address;
+  details: Account;
+}
+
+const accounts: Record<string, TestAccount> = {};
+const createAccount = () => {
+  const privateKey = randomBytes(32);
+  const publicKey = privateToPublic(privateKey);
+  const pubAddr = publicToAddress(publicKey);
+  const address = new Address(pubAddr);
+  const details = new Account(BigInt(0), BigInt(100000000));
+  return { privateKey, publicKey, address, details }
+}
+
+const createTx = (tx: TransactionModel, common: Common) => {
+  if (!accounts[tx.from]) {
+    accounts[tx.from] = createAccount();
+  }
+  const txData = {
+    "accessList": [],
+    from: accounts[tx.from].address.toString(),
+    "gasLimit": tx.gas,
+    "gasPrice": "0x5804253a",
+    "input": "0x",
+    "maxFeePerGas": "0x5804253a",
+    "maxPriorityFeePerGas": "0x5804252a",
+    "nonce": accounts[tx.from].details.nonce++,
+    to: tx.to,
+    "transactionIndex": tx.transactionIndex,
+    "type": tx.type,
+    "value": tx.value
+  };
+  const txFactory = TransactionFactory.fromTxData(txData, { common });
+  const signedTx = txFactory.sign(accounts[tx.from].privateKey);
+  const serialised = signedTx.toJSON();
+  return {
+    txRawData: {
+      ...tx,
+      v: serialised.v,
+      r: serialised.r, 
+      s: serialised.s, 
+      from: accounts[tx.from].address.toString(),
+      //hash: bytesToHex(signedTx.hash()),
+      nonce: intToHex(signedTx.nonce)  
+    },
+    txSigned: signedTx,
+  }
+}
+
 /**
  * Generate the fake data that will be used by the server. This can be serialised in a json file and changed by hand later
  * to better suit some specific scenarios.
@@ -67,7 +125,13 @@ export const evmGetModel = (key: string) => {
  * @param isPrimary allow us to know if its the initial blockchain so we dont add fork element yet
  * @returns Recor<string, string> - Object with hexBlockNumber and hash so we can replace them after fork happens
  */
-export const generateFakeData = (fakeData: FakeData, dataConfig: BlockGeneration, isPrimary: boolean): Record<string, string> => {
+export const generateFakeData = async (fakeData: FakeData, dataConfig: BlockGeneration, isPrimary: boolean): Promise<Record<string, string>> => {
+  // check fakeId
+  const common = Common.custom({
+    chainId: BigInt(fakeData.chainId),
+    networkId: BigInt(fakeData.chainId),
+  });
+  common.setEIPs([1559])
   const blockList: Record<string, string> = {};
   let blockNumber = BigInt(dataConfig.blockStartNumber);
   let i = 0;
@@ -89,19 +153,23 @@ export const generateFakeData = (fakeData: FakeData, dataConfig: BlockGeneration
     blockItem.hash = blockConfig?.hash ?? randomHash();
     blockList[blockHexNumber] = blockItem.hash;
     blockItem.parentHash = blockParentHash;
+    const trieTransaction = [];
     if (blockConfig) {
       blockItem.transactions = [];
       for (let txIdx = 0; txIdx < blockConfig.txLength; txIdx++) {
         const config: BaseConfig | undefined = blockConfig.txConfig[txIdx];
         if (config) {
           // we have a configuration for the transaction
-          const txItem = getTransactionModel(config.txModel);
+          let txItem = getTransactionModel(config.txModel);
           if (config.TxType === ItemType.VALID_ITEM) {
             txItem.hash = config.txHash ?? randomHash();
             txItem.blockHash = blockItem.hash;
             txItem.blockNumber = blockHexNumber;
             txItem.transactionIndex = intToHex(txIdx);
+            const { txRawData, txSigned } = createTx(txItem, common);
+            txItem = txRawData;
             const rcptItem = getReceiptModel(config.rcptModel);
+            trieTransaction.push(txSigned);
             if (config.RcptType === ItemType.VALID_ITEM) {
               rcptItem.blockNumber = blockHexNumber;
               rcptItem.blockHash = blockItem.hash;
@@ -124,26 +192,28 @@ export const generateFakeData = (fakeData: FakeData, dataConfig: BlockGeneration
           fakeData.transactions[txItem.hash] = txItem;
         } else {
           // we use a basic transaction model
-          const txItem = {...singleTransaction};
-          txItem.hash = randomHash();
-          txItem.blockHash = blockItem.hash;
-          txItem.blockNumber = blockHexNumber;
-          txItem.transactionIndex = intToHex(txIdx);
+          const txModel = {...singleTransaction};
+          txModel.hash = randomHash();
+          txModel.blockHash = blockItem.hash;
+          txModel.blockNumber = blockHexNumber;
+          txModel.transactionIndex = intToHex(txIdx);
+          const { txRawData, txSigned } = createTx(txModel, common);
           const rcptItem = getReceiptModel();
           rcptItem.blockNumber = blockHexNumber;
           rcptItem.blockHash = blockItem.hash;
-          rcptItem.transactionHash = txItem.hash;
-          rcptItem.transactionIndex = txItem.transactionIndex;
+          rcptItem.transactionHash = txRawData.hash;
+          rcptItem.transactionIndex = txRawData.transactionIndex;
           rcptItem.logs = rcptItem.logs.map((rcpt: ReceiptModel) => {
             rcpt.blockNumber = blockHexNumber;
             rcpt.blockHash = blockItem.hash;
-            rcpt.transactionHash = txItem.hash;
-            rcpt.transactionIndex = txItem.transactionIndex;
+            rcpt.transactionHash = txRawData.hash;
+            rcpt.transactionIndex = txRawData.transactionIndex;
             return rcpt;
           });
-          blockItem.transactions.push(txItem);
-          fakeData.transactions[txItem.hash] = txItem;
-          fakeData.receipts[txItem.hash] = rcptItem;
+          blockItem.transactions.push(txRawData);
+          trieTransaction.push(txSigned);
+          fakeData.transactions[txRawData.hash] = txRawData;
+          fakeData.receipts[txRawData.hash] = rcptItem;
         }
       }
     } else {
@@ -153,25 +223,30 @@ export const generateFakeData = (fakeData: FakeData, dataConfig: BlockGeneration
         transaction.blockHash = blockItem.hash;
         transaction.blockNumber = blockHexNumber;
         fakeData.transactions[transaction.hash] = transaction; // this is not used at the moment
+        const { txRawData, txSigned } = createTx(transaction, common);
+        trieTransaction.push(txSigned);
         const receipt = {
           ...rcptItem,
           blockNumber: blockHexNumber,
           blockHash: blockItem.hash,
-          transactionHash: transaction.hash,
-          transactionIndex: transaction.transactionIndex,
+          transactionHash: txRawData.hash,
+          transactionIndex: txRawData.transactionIndex,
         };
         receipt.logs = receipt.logs.map((rcpt: ReceiptModel) => {
           rcpt.blockNumber = blockHexNumber;
           rcpt.blockHash = blockItem.hash;
-          rcpt.transactionHash = transaction.hash;
-          rcpt.transactionIndex = transaction.transactionIndex;
+          rcpt.transactionHash = txRawData.hash;
+          rcpt.transactionIndex = txRawData.transactionIndex;
           return rcpt;
         })
-        fakeData.receipts[transaction.hash] = receipt;
-        return transaction;
+        fakeData.receipts[txRawData.hash] = receipt;
+        return txRawData;
       });
 
     }
+    // calculate trie
+    const trie = await Block.genTransactionsTrieRoot(trieTransaction, new Trie());
+    blockItem.transactionsRoot = bytesToHex(trie);
     fakeData.blocks[blockItem.hash] = blockItem;
     blockParentHash = blockItem.hash;
     if (isPrimary) { // the primary range should have the most blocks and be the one listed
