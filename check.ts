@@ -4,15 +4,22 @@ import { Blockchain } from '@ethereumjs/blockchain'
 import { Common, CustomChain } from '@ethereumjs/common'
 import { Trie } from '@ethereumjs/trie'
 import { VM } from '@ethereumjs/vm'
-import { privateToPublic, publicToAddress, Address, Account, bytesToHex, intToHex } from '@ethereumjs/util'
+import { privateToPublic, publicToAddress, Address, Account, bytesToHex } from '@ethereumjs/util'
+import { intToHex } from './src/utils';
 import { randomBytes } from 'crypto'
-import { time } from 'console'
+import singleTransaction from "./src/models/singleTransaction.json";
+import { TransactionModel } from './src/type'
 
 (BigInt.prototype as any).toJSON = function() {
   return this.toString()
 }
-
-const accounts = {};
+interface TestAccount {
+  privateKey: Buffer;
+  publicKey: Uint8Array;
+  address: Address;
+  details: Account;
+}
+const accounts: Record<string, TestAccount> = {};
 const createAccount = () => {
   const privateKey = randomBytes(32);
   const publicKey = privateToPublic(privateKey)
@@ -20,6 +27,53 @@ const createAccount = () => {
   const address = new Address(pubAddr)
   const details = new Account(BigInt(0), BigInt(530100001330000000000000))
   return { privateKey, publicKey, address, details }
+}
+
+const createTx = (tx: TransactionModel, common: Common) => {
+  if (!accounts[tx.from]) {
+    accounts[tx.from] = createAccount();
+  }
+  /*const txData = {
+    from: accounts[tx.from].address.toString(),
+    nonce: accounts[tx.from].details.nonce++,
+    gasPrice: tx.gasPrice,
+    gasLimit: tx.gas,
+    to: tx.to,
+    value: tx.value,
+    data: tx.input,
+    chainId: common.chainId(),
+  };*/
+
+  const txData = {
+    "accessList": [],
+    from: accounts[tx.from].address.toString(),
+    "gasLimit": tx.gas,
+    "gasPrice": "0x5804253a",
+    "input": "0x",
+    "maxFeePerGas": "0x5804253a",
+    "maxPriorityFeePerGas": "0x5804252a",
+    "nonce": accounts[tx.from].details.nonce++,
+    to: tx.to,
+    "transactionIndex": tx.transactionIndex,
+    "type": tx.type,
+    "value": tx.value
+  }
+  
+  const txFactory = TransactionFactory.fromTxData(txData, { common });
+  const signedTx = txFactory.sign(accounts[tx.from].privateKey);
+  const serialised = signedTx.toJSON();
+  return {
+    txItem: {
+      ...tx,
+      v: serialised.v,
+      r: serialised.r, 
+      s: serialised.s, 
+      from: accounts[tx.from].address.toString(),
+      hash: bytesToHex(signedTx.hash()),
+      nonce: intToHex(signedTx.nonce)  
+    },
+    signedTx,
+  }
 }
 
 async function createBlocks() {
@@ -75,11 +129,22 @@ async function createBlocks() {
           "type": "0x2",
           "value": "0x1402462f6000"
         }
-        const tx = TransactionFactory.fromTxData(txData, { common })
-        const signedTx = tx.sign(account.privateKey);
+        const { txItem, signedTx } = createTx(singleTransaction, common);
+        /*const tx = TransactionFactory.fromTxData(txData, { common })
+        const signedTx = tx.sign(account.privateKey);*/
         transactions.push(signedTx)
         console.log(bytesToHex(signedTx.hash()));
+        const serialised = signedTx.toJSON()
         console.log(signedTx.toJSON());
+        /*console.log ({
+          ...tx,
+          v: serialised.v,
+          r: serialised.r, 
+          s: serialised.s, 
+          from: accounts[tx.from].address.toString(),
+          hash: bytesToHex(signedTx.hash()),
+          nonce: intToHex(signedTx.nonce)  
+        });*/
       }  
     //}
     const trie = await Block.genTransactionsTrieRoot(transactions, new Trie());
