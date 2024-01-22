@@ -1,4 +1,4 @@
-import { FakeData, IncreaseType, ReplaceType, JSONRPC, RPCResponse } from "./type";
+import { FakeData, IncreaseType, ReplaceType, JSONRPC, RPCResponse, TransactionModel } from "./type";
 import { blockSeriesGenerate } from "./generate-data";
 
 const timerList: Record<string, NodeJS.Timeout | undefined> = {};
@@ -37,18 +37,20 @@ export const getResponse = async (body: JSONRPC | undefined, data: Record<string
     "jsonrpc": "2.0",
     "id": body.id,
   }
-  //console.log(data['eth_getBlockByNumber'][currentIndex]);
-  //console.log(data['eth_getTransactionReceipt'][currentIndex]);
   switch (body.method) {
     case 'eth_getBlockByNumber':
       //{"jsonrpc":"2.0","id":111,"method":"eth_getBlockByNumber","params":["0x296d3b5",true]}
       let number = body.params[0];
+      let includeTransaction = body.params[1] ?? false;
       if (number === 'latest') {
         number = fakeData.blockNavigation.list[fakeData.blockNavigation.index];
       }
       if (typeof number === 'string') {
         const hash = fakeData.blockByNumber[number];
         rpcData.result = fakeData.blocks[hash ?? ''];
+        if (includeTransaction === false) {
+          rpcData.result = {...rpcData.result, transactions: rpcData.result.transactions.map((tx: TransactionModel) => tx.hash)}
+        }
         if (fakeData.replaceType === ReplaceType.AFTER_FIRST_READ && fakeData.replaceBlock) {
           const existHash = fakeData.replaceBlock[number];
           if (existHash) {
