@@ -90,6 +90,10 @@ const evmMockServer = async (serverPort: number = 55001, serverHook?: ServerHook
       const rawData: string = await basicBody(request);
       fakeData[request.url] = await extractBody(rawData);
       //return sendChunkedResponse(response, fakeData[request.url]);
+      // Change with option to stream or maybe stream dump file
+      if (Object.keys(fakeData[request.url].transactions).length > 50000) {
+        return response.end(JSON.stringify({ 'warning': 'data is too large to stringify' }));
+      }
       return response.end(JSON.stringify(fakeData[request.url]));
     } else if (request.method === 'POST') {
       const rawData: string = await basicBody(request);
