@@ -136,6 +136,15 @@ await fetch(rpcUrl, {
 })
 ```
 
+ 3. Large data set
+
+ There is a problem when you try to generate data with more than 100k transactions, the memory get saturated and the generation is very slow. As of now we are signing all transaction which slow things down but we also prevent the endpoint from sending the full object results as it provoke some oom.
+ Intead you will receive a warning
+
+ ```
+ { warning: 'data is too large to stringify' }
+ ```
+
 ### 2. HTTP Server
 
 The core of the service, the HTTP server reads the data previously generated and sends it back according to basic configurations you provide during creation. We've kept the structure as simple as possible, opting to split the fake data you create by URL. This approach enables multiple scenarios based on the URL you call, facilitating concurrent testing.
@@ -196,12 +205,11 @@ Please adhere to Starton's [Code of Conduct](./CODE_OF_CONDUCT.md).
 
 Please use the develop branch in order to contribute with PR
 
-- [x] Add a test with viem
-- [x] Add a test with etherjs
 - [ ] Create scenarios with list of block and a fork
 - [ ] Find edge cases for test
 - [ ] Test server with different latency values
-- [ ] Error when we have more than 1000 object from json length
+- [ ] Error when we have more than 1000 object from json length (use stream to write or res)
+- [ ] Options to sign transactions to increase speed of tx generation
 
 ## License
 
