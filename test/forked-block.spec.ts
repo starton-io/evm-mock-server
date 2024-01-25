@@ -127,7 +127,6 @@ describe('Testing the test server', () => {
         assert(newBlock.transactions.length === 7, 'New block should have 7 transactions');
         assert(newBlock.parentHash !== blockHashList[i - 1], 'Last block hash is not different than the current parentHash');
         // parentHash should be different than the current holded one
-        console.log(navBlock - 1n)
         const prevBlock = await viem.getBlock({
           blockNumber: navBlock - 1n,
         });
