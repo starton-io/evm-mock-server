@@ -263,8 +263,13 @@ export const generateFakeData = async (fakeData: FakeData, dataConfig: BlockGene
  * Create a new valid block with a previous block existing
  * TODO: refactor with generateFakeData after we find options we could use
  */
-export const blockSeriesGenerate = (oldNumber: string, fakeData: FakeData) => {
+export const blockSeriesGenerate = async (oldNumber: string, fakeData: FakeData) => {
   if (!fakeData.blockNavigation.list[fakeData.blockNavigation.index]) {
+    const common = Common.custom({
+      chainId: BigInt(fakeData.chainId),
+      networkId: BigInt(fakeData.chainId),
+    });
+    common.setEIPs([1559])
     const nextNumber = BigInt(oldNumber) + 1n;
     const blockHexNumber = intToHex(nextNumber);
     const blockItem = getBlockModel();
@@ -273,28 +278,33 @@ export const blockSeriesGenerate = (oldNumber: string, fakeData: FakeData) => {
     fakeData.blockByNumber[blockHexNumber] = blockItem.hash;
     blockItem.parentHash = fakeData.blockByNumber[oldNumber] ?? '0x0000000000000000000000000000000000000000000000000000000000000000';
     const rcptItem = getReceiptModel();
+    const trieTransaction: Array<any> = [];
     blockItem.transactions = blockItem.transactions.map((transaction) => {
       transaction.hash = randomHash();
       transaction.blockHash = blockItem.hash;
       transaction.blockNumber = blockHexNumber;
-      fakeData.transactions[transaction.hash] = transaction; // this is not used at the moment
+      const { txRawData, txSigned } = createTx(transaction, common);
+      fakeData.transactions[transaction.hash] = txRawData; // this is not used at the moment
+      trieTransaction.push(txSigned);
       const receipt = {
         ...rcptItem,
         blockNumber: blockHexNumber,
         blockHash: blockItem.hash,
-        transactionHash: transaction.hash,
-        transactionIndex: transaction.transactionIndex,
+        transactionHash: txRawData.hash,
+        transactionIndex: txRawData.transactionIndex,
       };
       receipt.logs = receipt.logs.map((rcpt: ReceiptModel) => {
         rcpt.blockNumber = blockHexNumber;
         rcpt.blockHash = blockItem.hash;
-        rcpt.transactionHash = transaction.hash;
-        rcpt.transactionIndex = transaction.transactionIndex;
+        rcpt.transactionHash = txRawData.hash;
+        rcpt.transactionIndex = txRawData.transactionIndex;
         return rcpt;
       })
-      fakeData.receipts[transaction.hash] = receipt;
-      return transaction;
+      fakeData.receipts[txRawData.hash] = receipt;
+      return txRawData;
     });
+    const trie = await Block.genTransactionsTrieRoot(trieTransaction, new Trie());
+    blockItem.transactionsRoot = bytesToHex(trie);
     fakeData.blocks[blockItem.hash] = blockItem;
     fakeData.blockNavigation.list.push(blockHexNumber);
   }
