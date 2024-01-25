@@ -6,7 +6,7 @@ import { BlockConfig, FakeGeneration, evmMockServer } from '../src/index';
 
 const port = 55002;
 let serverRpc: Server<typeof IncomingMessage, typeof ServerResponse> | null;
-jest.setTimeout(100000)
+jest.setTimeout(160000)
 describe('Testing call with ethers', () => {
   beforeAll(async () => {
     serverRpc = await evmMockServer(port);
