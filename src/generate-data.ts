@@ -139,9 +139,9 @@ export const generateFakeData = async (fakeData: FakeData, dataConfig: BlockGene
   if (isPrimary === false && blockParentHash === '0x0000000000000000000000000000000000000000000000000000000000000000') {
     // should get the parentHash of the valid block?
     const previousBlockNumber = blockNumber - 1n;
-    const lastBlockHash = fakeData.blockByNumber[previousBlockNumber.toString()]
+    const lastBlockHash = fakeData.blockByNumber[intToHex(previousBlockNumber)];
     if (lastBlockHash) {
-      blockParentHash = fakeData.blocks[lastBlockHash].parentHash;
+      blockParentHash = fakeData.blocks[lastBlockHash].hash;
     }
   }
   while (i < dataConfig.blockSeriesLength) {

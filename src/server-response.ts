@@ -44,6 +44,7 @@ export const getResponse = async (body: JSONRPC | undefined, data: Record<string
       let includeTransaction = body.params[1] ?? false;
       if (number === 'latest') {
         number = fakeData.blockNavigation.list[fakeData.blockNavigation.index];
+        changeIndex(fakeData, url);
       }
       if (typeof number === 'string') {
         const hash = fakeData.blockByNumber[number];
@@ -57,7 +58,6 @@ export const getResponse = async (body: JSONRPC | undefined, data: Record<string
             fakeData.blockByNumber[number] = existHash;
           }
         }
-        changeIndex(fakeData, url);
       } else {
         rpcData.error = { code: -32000, message: `Could not find block ${number}` }
       }
