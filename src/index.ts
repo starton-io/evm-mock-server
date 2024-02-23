@@ -81,12 +81,25 @@ const sendChunkedResponse = (response: ServerResponse, rawData: FakeData) => {
   sendChunk();
 };*/
 
+let init = false;
+
 const evmMockServer = async (serverPort: number = 55001, serverHook?: ServerHook) => {
   const server = createServer(async (request: IncomingMessage, response: ServerResponse) => {
     if (!request.url) {
       request.url = '/';
     }
-    if (request.method === 'PUT') {
+    if (request.method === 'GET') {
+      if (request.url === '/sethealth') {
+        init = true;
+      } else if (request.url === '/health') {
+        if (!init) {
+          response.statusCode = 400;
+        }
+        return response.end(JSON.stringify({ 'health': init }));
+      }
+      response.statusCode = 404;
+      return response.end('Not found');
+    } else if (request.method === 'PUT') {
       const rawData: string = await basicBody(request);
       fakeData[request.url] = await extractBody(rawData);
       //return sendChunkedResponse(response, fakeData[request.url]);
