@@ -263,8 +263,8 @@ export const generateFakeData = async (fakeData: FakeData, dataConfig: BlockGene
  * Create a new valid block with a previous block existing
  * TODO: refactor with generateFakeData after we find options we could use
  */
-export const blockSeriesGenerate = async (oldNumber: string, fakeData: FakeData) => {
-  if (!fakeData.blockNavigation.list[fakeData.blockNavigation.index]) {
+export const blockSeriesGenerate = async (oldNumber: string, fakeData: FakeData, force = false) => {
+  if (!fakeData.blockNavigation.list[fakeData.blockNavigation.index] || force) {
     const common = Common.custom({
       chainId: BigInt(fakeData.chainId),
       networkId: BigInt(fakeData.chainId),
