@@ -24,6 +24,20 @@ const changeIndex = async (fakeData: FakeData, url: string) => {
   }
 }
 
+const existingIndex = async (currentNumber: string, fakeData: FakeData, url: string) => {
+  if (fakeData.blockNavigation.idxType === IncreaseType.SERIAL) {
+    if (!fakeData.blockByNumber[currentNumber]) {
+      // check if previous block exist as we want a continuation
+      const test = BigInt(currentNumber) - 1n;
+      const oldNumber = test.toString();
+      if (fakeData.blockByNumber[oldNumber]) {
+        await blockSeriesGenerate(oldNumber, fakeData, true);
+      }
+    }
+  }
+  return;
+}
+
 export const getResponse = async (body: JSONRPC | undefined, data: Record<string, FakeData> | undefined, url: string): Promise<RPCResponse> => {
   if (body === undefined || data === undefined) {
     // fake data is initialised at the root of the server so it cant be unitialised
@@ -47,6 +61,7 @@ export const getResponse = async (body: JSONRPC | undefined, data: Record<string
         await changeIndex(fakeData, url);
       }
       if (typeof number === 'string') {
+        existingIndex(number, fakeData, url)
         const hash = fakeData.blockByNumber[number];
         rpcData.result = fakeData.blocks[hash ?? ''];
         if (includeTransaction === false) {
