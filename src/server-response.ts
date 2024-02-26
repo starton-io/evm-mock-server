@@ -1,5 +1,6 @@
 import { FakeData, IncreaseType, ReplaceType, JSONRPC, RPCResponse, TransactionModel } from "./type";
 import { blockSeriesGenerate } from "./generate-data";
+import { intToHex } from "./utils";
 
 const timerList: Record<string, NodeJS.Timeout | undefined> = {};
 const timer = (ms: number, fakeData: FakeData, url: string, incr: number) => setTimeout(async () => {
@@ -29,9 +30,9 @@ const existingIndex = async (currentNumber: string, fakeData: FakeData, url: str
     if (!fakeData.blockByNumber[currentNumber]) {
       // check if previous block exist as we want a continuation
       const test = BigInt(currentNumber) - 1n;
-      const oldNumber = test.toString();
-      if (fakeData.blockByNumber[oldNumber]) {
-        await blockSeriesGenerate(oldNumber, fakeData, true);
+      const oldBlock = intToHex(test)
+      if (fakeData.blockByNumber[oldBlock]) {
+        await blockSeriesGenerate(oldBlock, fakeData, true);
       }
     }
   }
