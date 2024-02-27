@@ -62,7 +62,7 @@ export const getResponse = async (body: JSONRPC | undefined, data: Record<string
         await changeIndex(fakeData, url);
       }
       if (typeof number === 'string') {
-        existingIndex(number, fakeData, url)
+        await existingIndex(number, fakeData, url)
         const hash = fakeData.blockByNumber[number];
         rpcData.result = fakeData.blocks[hash ?? ''];
         if (includeTransaction === false) {
