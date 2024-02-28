@@ -120,6 +120,7 @@ export interface FakeGeneration {
   delayIndexMs?: number; // When calling the next block, allow the block index to change based on time
   increaseIndex?: number; // When calling the next block, set the next block number to be retrieved
   chainId?: number; // Specify a chainID otherwise will be 1
+  debug?: boolean; // show console log to debug
 }
 /**
  * Data used by the server to reply to the web3 clients
@@ -133,4 +134,5 @@ export interface FakeData {
   replaceType?: ReplaceType; // Indicates the type of replacement (e.g., after first read, after some time)
   blockNavigation: BlockNavigation; // Stores an array of block numbers and their index for simulating block retrieval
   chainId: string; // hexa value of the chainID
+  debug: boolean; // activate debugging with console log
 }

@@ -32,6 +32,9 @@ const existingIndex = async (currentNumber: string, fakeData: FakeData, url: str
       const test = BigInt(currentNumber) - 1n;
       const oldBlock = intToHex(test)
       if (fakeData.blockByNumber[oldBlock]) {
+        if (fakeData.debug) {
+          console.log('new block created: ', test);
+        }
         await blockSeriesGenerate(oldBlock, fakeData, true);
       }
     }
@@ -51,6 +54,9 @@ export const getResponse = async (body: JSONRPC | undefined, data: Record<string
   const rpcData: RPCResponse = {
     "jsonrpc": "2.0",
     "id": body.id,
+  }
+  if (fakeData.debug) {
+    console.log('received body: ', body);
   }
   switch (body.method) {
     case 'eth_getBlockByNumber':
