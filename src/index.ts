@@ -27,6 +27,7 @@ async function extractBody(rawData: string): Promise<FakeData> {
       idxType: IncreaseType.NONE,
     },
     chainId: '0x1',
+    debug: false,
   }
   const generation: FakeGeneration = JSON.parse(rawData);
   if (generation.chainId) {
@@ -44,6 +45,9 @@ async function extractBody(rawData: string): Promise<FakeData> {
   if (generation.delayIndexMs) {
     fakeData.blockNavigation.idxType = IncreaseType.TIME_BASED;
     fakeData.blockNavigation.indexDelay = generation.delayIndexMs;
+  }
+  if (generation.debug === true) {
+    fakeData.debug = true;
   }
   /*if (generation.chainId === 80001) {
     writeFile('./fixture-simple.json', JSON.stringify((fakeData), null, 2), (error) => {
